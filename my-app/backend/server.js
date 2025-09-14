@@ -2,14 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
+app.use(cors()); // 🔥 Allow frontend to connect
 app.use(express.json());
-app.use(cors()); // ✅ frontend से request allow करने के लिए
 
 let users = [];
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀 Use /users");
+  res.send("✅ Backend is running. Use /users to interact.");
 });
 
 // Get all users
@@ -24,9 +24,9 @@ app.post("/users", (req, res) => {
     return res.status(400).json({ error: "Name and age required" });
   }
   users.push({ name, age });
-  res.json({ message: "User added successfully" });
+  res.json({ message: "User added successfully ✅" });
 });
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
