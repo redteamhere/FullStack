@@ -1,43 +1,32 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.json());
+app.use(cors()); // ✅ frontend से request allow करने के लिए
 
-// Dummy DB (memory)
 let users = [];
 
-// Create User
-app.post("/users", (req, res) => {
-  const { name, email } = req.body;
-  const user = { id: users.length + 1, name, email };
-  users.push(user);
-  res.status(201).json(user);
+// Default route
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀 Use /users");
 });
 
-// Read All Users
+// Get all users
 app.get("/users", (req, res) => {
   res.json(users);
 });
 
-// Update User
-app.put("/users/:id", (req, res) => {
-  const { id } = req.params;
-  const { name, email } = req.body;
-  const user = users.find(u => u.id == id);
-  if (!user) return res.status(404).send("User not found");
-  user.name = name || user.name;
-  user.email = email || user.email;
-  res.json(user);
+// Add user
+app.post("/users", (req, res) => {
+  const { name, age } = req.body;
+  if (!name || !age) {
+    return res.status(400).json({ error: "Name and age required" });
+  }
+  users.push({ name, age });
+  res.json({ message: "User added successfully" });
 });
 
-// Delete User
-app.delete("/users/:id", (req, res) => {
-  const { id } = req.params;
-  users = users.filter(u => u.id != id);
-  res.send("User deleted");
-});
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
