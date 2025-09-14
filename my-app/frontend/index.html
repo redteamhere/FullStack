@@ -1,61 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Form</title>
-</head>
-<body>
-  <h1>User Form</h1>
-  <form id="userForm">
-    <input type="text" id="name" placeholder="Enter name" required />
-    <input type="number" id="age" placeholder="Enter age" required />
-    <button type="submit">Submit</button>
-  </form>
+const express = require("express");
+const cors = require("cors");
+const app = express();
 
-  <h2>Users List</h2>
-  <ul id="users"></ul>
+app.use(cors()); // 🔥 Allow frontend to connect
+app.use(express.json());
 
-  <script>
-    const backendUrl = "https://demo-deploy-e47z.onrender.com"; // 🔴 अपना backend URL यहां डालो
+let users = [];
 
-    // Form submit
-    document.getElementById("userForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+// Default route
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running. Use /users to interact.");
+});
 
-      const name = document.getElementById("name").value;
-      const age = document.getElementById("age").value;
+// Get all users
+app.get("/users", (req, res) => {
+  res.json(users);
+});
 
-      const res = await fetch(`${backendUrl}/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, age })
-      });
+// Add user
+app.post("/users", (req, res) => {
+  const { name, age } = req.body;
+  if (!name || !age) {
+    return res.status(400).json({ error: "Name and age required" });
+  }
+  users.push({ name, age });
+  res.json({ message: "User added successfully ✅" });
+});
 
-      if (res.ok) {
-        alert("User added ✅");
-        loadUsers();
-      } else {
-        alert("Error adding user ❌");
-      }
-    });
-
-    // Load users
-    async function loadUsers() {
-      const res = await fetch(`${backendUrl}/users`);
-      const users = await res.json();
-
-      const list = document.getElementById("users");
-      list.innerHTML = "";
-      users.forEach(u => {
-        const li = document.createElement("li");
-        li.textContent = `${u.name} (${u.age} years old)`;
-        list.appendChild(li);
-      });
-    }
-
-    // First load
-    loadUsers();
-  </script>
-</body>
-</html>
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
