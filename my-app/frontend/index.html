@@ -4,39 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Form</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 50px; }
-    input, button { padding: 8px; margin: 5px; width: 250px; }
-  </style>
 </head>
 <body>
-  <h2>Enter User Data</h2>
+  <h1>User Form</h1>
   <form id="userForm">
-    <input type="text" id="name" placeholder="Name" required><br>
-    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="text" id="name" placeholder="Enter name" required />
+    <input type="number" id="age" placeholder="Enter age" required />
     <button type="submit">Submit</button>
   </form>
 
-  <p id="msg"></p>
+  <h2>Users List</h2>
+  <ul id="users"></ul>
 
   <script>
+    const backendUrl = "https://demo-deploy-e47z.onrender.com"; // 🔴 अपना backend URL यहां डालो
+
+    // Form submit
     document.getElementById("userForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
 
-      const res = await fetch("https://YOUR-BACKEND-URL.onrender.com/users", {
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+
+      const res = await fetch(`${backendUrl}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email })
+        body: JSON.stringify({ name, age })
       });
 
       if (res.ok) {
-        document.getElementById("msg").innerText = "Data submitted successfully!";
+        alert("User added ✅");
+        loadUsers();
       } else {
-        document.getElementById("msg").innerText = "Error submitting data.";
+        alert("Error adding user ❌");
       }
     });
+
+    // Load users
+    async function loadUsers() {
+      const res = await fetch(`${backendUrl}/users`);
+      const users = await res.json();
+
+      const list = document.getElementById("users");
+      list.innerHTML = "";
+      users.forEach(u => {
+        const li = document.createElement("li");
+        li.textContent = `${u.name} (${u.age} years old)`;
+        list.appendChild(li);
+      });
+    }
+
+    // First load
+    loadUsers();
   </script>
 </body>
 </html>
